@@ -1,23 +1,41 @@
 #!/bin/bash
+set -euxo pipefail
 
-set -ouex pipefail
+# Install 1Password
+echo "Installing 1Password..."
+curl -LsS https://downloads.1password.com/linux/keys/1password.asc -o /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
 
-RELEASE="$(rpm -E %fedora)"
+cat <<EOF > /etc/yum.repos.d/1password.repo
+[1password]
+name=1Password Stable Channel
+baseurl=https://downloads.1password.com/linux/rpm/stable/\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-1password
+EOF
+
+# Commit after installing 1Password repo
+rpm-ostree install 1password 1password-cli && \
+    ostree container commit
+
+# Install Brave Browser
+BRAVE_BASEURL="https://brave-browser-rpm-release.s3.brave.com"
+KEY_BASEURL="https://brave-browser-rpm-release.s3.brave.com"
+
+echo "Installing Brave Browser..."
+curl -LsS $BRAVE_BASEURL/brave-browser.repo -o /etc/yum.repos.d/brave-browser.repo
+curl -LsS $KEY_BASEURL/brave-core.asc -o /etc/pki/rpm-gpg/brave-core.asc
 
 
-### Install packages
+rpm-ostree install brave-browser && \
+    ostree container commit
 
-# Packages can be installed from any enabled yum repo on the image.
-# RPMfusion repos are available by default in ublue main images
-# List of rpmfusion packages can be found here:
-# https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
+# Install additional tools
+echo "Installing additional tools..."
+rpm-ostree install screen && \
+    ostree container commit
 
-# this installs a package from fedora repos
-rpm-ostree install screen
-
-# this would install a package from rpmfusion
-# rpm-ostree install vlc
-
-#### Example for enabling a System Unit File
+echo "Build script completed successfully."
 
 systemctl enable podman.socket
