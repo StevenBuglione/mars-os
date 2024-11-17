@@ -15,9 +15,6 @@ repo_gpgcheck=0
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-1password
 EOF
 
-# Commit after installing 1Password repo
-rpm-ostree install 1password 1password-cli && \
-    ostree container commit
 
 # Install Brave Browser
 BRAVE_BASEURL="https://brave-browser-rpm-release.s3.brave.com"
@@ -28,12 +25,9 @@ curl -LsS $BRAVE_BASEURL/brave-browser.repo -o /etc/yum.repos.d/brave-browser.re
 curl -LsS $KEY_BASEURL/brave-core.asc -o /etc/pki/rpm-gpg/brave-core.asc
 
 
-rpm-ostree install brave-browser && \
-    ostree container commit
-
 # Install additional tools
 echo "Installing additional tools..."
-rpm-ostree install screen && \
+rpm-ostree install screen 1password 1password-cli brave-browser && \
     ostree container commit
 
 echo "Build script completed successfully."
