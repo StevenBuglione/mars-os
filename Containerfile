@@ -1,5 +1,5 @@
-ARG SOURCE_IMAGE="bluefin"
-ARG SOURCE_SUFFIX="-dx-nvidia"
+ARG SOURCE_IMAGE="bazzite"
+ARG SOURCE_SUFFIX="-gnome-nvidia"
 ARG SOURCE_TAG="latest"
 
 FROM ghcr.io/ublue-os/${SOURCE_IMAGE}${SOURCE_SUFFIX}:${SOURCE_TAG}
